@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+    <title>Escape de la Terminal</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="intro-screen">
+        <h1 class="glitch-text">ESCAPE DE LA TERMINAL</h1>
+        <p class="typing-effect">Sistema comprometido. Necesitas escapar.</p>
+        <div class="instructions">
+            <p>Usa comandos reales de terminal para sobrevivir.</p>
+            <p>Comandos disponibles: ls, cd, cat, clear, help...</p>
+        </div>
+        <button class="start-button" onclick="startGame()">INICIAR SISTEMA</button>
+        <div class="author-signature">Created by Roberto Cano Estévez</div>
+    </div>
+
+    <div id="terminal" style="display: none;">
+        <div id="terminal-header">
+            <span class="terminal-title"></span>
+            <span class="terminal-buttons">
+                <span class="btn close" onclick="exitGame()"></span>
+                <span class="btn minimize"></span>
+                <span class="btn maximize"></span>
+            </span>
+        </div>
+        <div id="output"></div>
+        <div id="input-line">
+            <span class="prompt"></span>
+            <input type="text" id="command-input" autofocus autocomplete="off">
+        </div>
+    </div>
+    <script src="game.js"></script>
+    <script src="terminal.js"></script>
+</body>
+</html>

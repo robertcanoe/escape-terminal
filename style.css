@@ -1,0 +1,366 @@
+body {
+    background-color: #000;
+    color: #0f0;
+    font-family: 'Courier New', Courier, monospace;
+    padding: 1rem;
+    margin: 0;
+  }
+  
+  #terminal {
+    max-width: 800px;
+    margin: auto;
+    white-space: pre-wrap;
+    height: 90vh;
+    overflow-y: auto;
+    padding: 1rem;
+    scrollbar-width: thin;
+    scrollbar-color: #0f0 #000;
+    scroll-behavior: smooth;
+  }
+  
+  #terminal::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  #terminal::-webkit-scrollbar-track {
+    background: #000;
+  }
+  
+  #terminal::-webkit-scrollbar-thumb {
+    background-color: #0f0;
+    border-radius: 4px;
+  }
+  
+  #output {
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  #input-line {
+    display: flex;
+    align-items: center;
+    position: sticky;
+    bottom: 0;
+    background: #000;
+    padding: 0.5rem 0;
+  }
+  
+  .prompt {
+    color: #0f0;
+    margin-right: 0.5rem;
+    user-select: none;
+    opacity: 0.8;
+    white-space: nowrap;
+  }
+  
+  #command-input {
+    background: transparent;
+    border: none;
+    color: #0f0;
+    outline: none;
+    width: 100%;
+    font-family: inherit;
+    margin-left: 0.5rem;
+  }
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+.cursor {
+  animation: blink 1s step-start infinite;
+}
+
+.error-message {
+  color: #ff0000;
+}
+
+.success-message {
+  color: #00ff00;
+}
+
+#intro-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.glitch-text {
+  font-size: 2.5rem;
+  color: #0f0;
+  text-shadow: 2px 2px #ff0000;
+  animation: glitch 1s infinite;
+}
+
+.start-button {
+  margin-top: 2rem;
+  padding: 1rem 2rem;
+  background: transparent;
+  border: 2px solid #0f0;
+  color: #0f0;
+  font-family: 'Courier New', Courier, monospace;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.start-button:hover {
+  background: #0f0;
+  color: #000;
+}
+
+.typing-effect {
+  overflow: hidden;
+  white-space: nowrap;
+  border-right: 2px solid #0f0;
+  animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+}
+
+@keyframes typing {
+  from { width: 0 }
+  to { width: 100% }
+}
+
+@keyframes glitch {
+  0% { transform: translate(0) }
+  20% { transform: translate(-2px, 2px) }
+  40% { transform: translate(-2px, -2px) }
+  60% { transform: translate(2px, 2px) }
+  80% { transform: translate(2px, -2px) }
+  100% { transform: translate(0) }
+}
+
+/* Efectos visuales */
+.effect {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 2rem;
+    background: rgba(0, 0, 0, 0.9);
+    border: 2px solid #0f0;
+    color: #0f0;
+    font-size: 2rem;
+    z-index: 1000;
+    animation: pulse 1s infinite;
+}
+
+.hack {
+    text-shadow: 0 0 10px #0f0;
+}
+
+.decrypt {
+    border-color: #00ff00;
+    text-shadow: 0 0 10px #00ff00;
+}
+
+.warning {
+    border-color: #ff0000;
+    color: #ff0000;
+    text-shadow: 0 0 10px #ff0000;
+}
+
+/* Pantalla de victoria */
+.victory-screen {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 2rem;
+    background: rgba(0, 0, 0, 0.95);
+    border: 2px solid #0f0;
+    color: #0f0;
+    text-align: center;
+    z-index: 1000;
+    animation: slideIn 0.5s ease-out;
+}
+
+.victory-screen h2 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    text-shadow: 0 0 10px #0f0;
+}
+
+.victory-screen button {
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    background: transparent;
+    border: 1px solid #0f0;
+    color: #0f0;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.victory-screen button:hover {
+    background: #0f0;
+    color: #000;
+}
+
+@keyframes pulse {
+    0% { transform: translate(-50%, -50%) scale(1); }
+    50% { transform: translate(-50%, -50%) scale(1.1); }
+    100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+@keyframes slideIn {
+    from { transform: translate(-50%, -100%); opacity: 0; }
+    to { transform: translate(-50%, -50%); opacity: 1; }
+}
+
+/* Mejoras para el espaciado de la terminal */
+.terminal-line {
+    padding: 0.3rem 0;
+    line-height: 1.5;
+    width: 100%;
+}
+
+.terminal-line.command {
+    color: #0f0;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.terminal-line.response {
+    color: #0f0;
+    margin-left: 1rem;
+}
+
+.terminal-line.error {
+    color: #ff0000;
+    margin-left: 1rem;
+}
+
+.terminal-line.success {
+    color: #00ff00;
+    margin-top: 0.4rem;
+    margin-bottom: 0.8rem;
+    padding-left: 1rem;
+}
+
+/* Estilos para diferentes tipos de mensajes */
+.terminal-line.error {
+    color: #ff0000;
+    margin-top: 0.4rem;
+    margin-bottom: 0.8rem;
+    padding-left: 1rem;
+}
+
+.terminal-line.success {
+    color: #00ff00;
+    margin-top: 0.4rem;
+    margin-bottom: 0.8rem;
+    padding-left: 1rem;
+}
+
+.terminal-line.info {
+    color: #0099ff;
+    margin-top: 0.3rem;
+    margin-bottom: 0.3rem;
+}
+
+/* Estilo para el briefing del reto */
+.terminal-line.mission {
+    margin: 0.5rem 0;
+}
+
+.terminal-line.mission-header {
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+}
+
+.terminal-line.mission-content {
+    margin-bottom: 0.3rem;
+}
+
+.terminal-line.mission-footer {
+    margin-bottom: 1.5rem;
+}
+
+#terminal-header {
+    padding: 0.5rem 1rem;
+    background: #1a1a1a;
+    border-bottom: 1px solid #333;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.terminal-title {
+    color: #0f0;
+    font-size: 0.9rem;
+}
+
+.terminal-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.btn.close { 
+    background-color: #ff5f56; 
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn.close:hover {
+    transform: scale(1.2);
+    box-shadow: 0 0 10px #ff0000;
+}
+
+/* Añadir tooltip al botón de salida */
+.btn.close::before {
+    content: "Salir";
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 12px;
+    color: #fff;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+}
+
+.btn.close:hover::before {
+    opacity: 1;
+}
+
+.btn.minimize { background-color: #ffbd2e; }
+.btn.maximize { background-color: #27c93f; }
+
+.author-signature {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    color: #0f0;
+    opacity: 0.5;
+    font-size: 0.8rem;
+    font-family: 'Courier New', Courier, monospace;
+    text-shadow: 0 0 5px #0f0;
+    transition: opacity 0.3s;
+}
+
+.author-signature:hover {
+    opacity: 1;
+}
