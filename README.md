@@ -58,10 +58,6 @@ Debes navegar por el sistema de archivos, descubrir pistas y resolver el desafí
 | `Ctrl + C` | Salir del juego |
 | `Tab` | Autocompletar|
 
-## 👨‍💻 Autor
-
-**Roberto Cano Estévez**
-
 ---
 
 ### 📄 Licencia
