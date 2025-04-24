@@ -537,7 +537,6 @@ function showVictoryScreen(achievements) {
         <button onclick="exitGame()" class="exit-game">Salir</button>
     </div>
 `;
-
     
     document.body.appendChild(victoryDiv);
     
