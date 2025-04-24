@@ -57,7 +57,7 @@
                 <span class="btn close" onclick="exitGame()" title="Salir"></span>
             </div>
             <div class="terminal-title">user@escape:~</div>
-            <div class="terminal-stats">
+            <div class="stats">
                 <span class="time">10:00</span>
                 <span class="hints">💡 3</span>
                 <span class="score">0 pts</span>
@@ -67,6 +67,20 @@
         <div id="input-line">
             <span class="prompt">$</span>
             <input type="text" id="command-input" autofocus spellcheck="false" autocomplete="off">
+        </div>
+    </div>
+
+    <!-- Victory Screen -->
+    <div class="victory-screen" style="display: none;">
+        <h2>¡Sistema Hackeado con Éxito!</h2>
+        <ul>
+            <li>Tiempo: <span id="victory-time"></span></li>
+            <li>Pistas Usadas: <span id="victory-hints"></span></li>
+            <li>Puntuación: <span id="victory-score"></span></li>
+        </ul>
+        <div class="victory-buttons">
+            <button class="next-challenge">Siguiente Reto</button>
+            <button class="exit-game">Salir</button>
         </div>
     </div>
 
