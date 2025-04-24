@@ -331,12 +331,71 @@ function isVictoryConditionMet() {
 function victory() {
     clearInterval(gameState.timerInterval);
     
+    // Remover pantalla de victoria anterior si existe
+    const existingVictoryScreen = document.querySelector('.victory-screen');
+    if (existingVictoryScreen) {
+        existingVictoryScreen.remove();
+    }
+    
     // Calcular puntuación final
     const timeBonus = Math.floor(gameState.timeRemaining / 10);
+    const baseScore = gameState.score;
     gameState.score += timeBonus;
     
     // Verificar logros
     const achievements = checkAchievements();
+    const totalBonus = achievements.reduce((sum, a) => sum + a.points, 0);
+    
+    // Crear pantalla de victoria
+    const victoryDiv = document.createElement('div');
+    victoryDiv.className = 'victory-screen fade-effect';
+    
+    const achievementsList = achievements.map(a => `
+        <li class="achievement">
+            <span class="achievement-name">${a.name}</span>
+            <span class="achievement-desc">${a.description}</span>
+            <span class="achievement-points">+${a.points}</span>
+        </li>
+    `).join('');
+    
+    victoryDiv.innerHTML = `
+        <h2>¡MISIÓN COMPLETADA!</h2>
+        <div class="stats-container">
+            <div class="stat-item">
+                <span class="stat-label">Tiempo Restante:</span>
+                <span class="stat-value">${formatTime(gameState.timeRemaining)}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Puntuación Base:</span>
+                <span class="stat-value">${baseScore}</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Bonus Tiempo:</span>
+                <span class="stat-value">+${timeBonus}</span>
+            </div>
+            ${achievements.length > 0 ? `
+                <div class="achievements-container">
+                    <h3>Logros Desbloqueados:</h3>
+                    <ul class="achievements-list">
+                        ${achievementsList}
+                    </ul>
+                    <div class="bonus-points">
+                        Bonus Total: +${totalBonus}
+                    </div>
+                </div>
+            ` : ''}
+            <div class="final-score">
+                Puntuación Final: ${gameState.score + totalBonus}
+            </div>
+        </div>
+        <div class="victory-buttons">
+            <button onclick="startNewChallenge()" class="next-mission">Siguiente Misión</button>
+            <button onclick="exitGame()" class="exit-game">Salir</button>
+        </div>
+    `;
+    
+    // Añadir la pantalla de victoria al DOM
+    document.body.appendChild(victoryDiv);
     
     // Mostrar efectos de victoria
     showEffect("🏆 ¡RETO COMPLETADO! 🏆", "success");
@@ -344,13 +403,10 @@ function victory() {
         showEffect("⭐ +" + timeBonus + " pts por tiempo", "success");
     }, 1000);
     
-    // Mostrar pantalla de victoria
-    showVictoryScreen(achievements);
-    
     // Guardar progreso
     saveGameState();
     
-    // Reproducir efecto de confeti
+    // Efecto de confeti
     showEffect("🎉", "success");
 }
 
