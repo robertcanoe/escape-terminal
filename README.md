@@ -1,74 +1,82 @@
-# Escape de la Terminal 🕹️
+# Escape Terminal 🖥️
 
-> Un juego de escape basado en terminal donde debes usar comandos reales de Linux para resolver desafíos y escapar de un sistema comprometido.
+Un juego de escape room basado en terminal donde deberás usar comandos de Linux para resolver retos y escapar antes de que se agote el tiempo.
 
-## ✨ Características
+## 🎮 Características
 
-* **Comandos Reales**: Usa comandos Linux auténticos como `ls`, `cd`, `cat`, etc.
-* **Desafíos Aleatorios**: Cada partida presenta un reto diferente
-* **Múltiples Escenarios**: Varias misiones incluyendo:
-  - Hackeo del Sistema
-  - Caza de Virus
-  - Recuperación de Datos
-  - Explotación del Kernel
-* **Juego Contrarreloj**: Completa los desafíos antes de que se acabe el tiempo
-* **Sistema de Pistas**: Obtén ayuda cuando estés atascado (pistas limitadas)
+- Sistema de terminal interactivo con comandos reales de Linux
+- Múltiples retos con dificultad progresiva
+- Sistema de pistas y logros
+- Efectos visuales y animaciones
+- Puntuación basada en tiempo y rendimiento
+- Guardado automático del progreso
+- Interfaz retro con efectos modernos
 
-## 🛠️ Tecnologías
+## 📝 Comandos Disponibles
 
-* HTML5
-* CSS3
-* JavaScript
-* Sin dependencias externas
+- `ls [-l] [-a] [path]` - Listar archivos
+- `cd [dir]` - Cambiar directorio
+- `pwd` - Mostrar directorio actual
+- `cat <file>` - Mostrar contenido de archivo
+- `tree [path]` - Mostrar estructura de directorios
+- `find <pattern>` - Buscar archivos por nombre
+- `grep <pattern> <files...>` - Buscar texto en archivos
+- `clear` - Limpiar la pantalla
+- `help` - Mostrar ayuda
+- `hint` - Mostrar una pista (limitado)
 
-## 🚀 Instalación
+## 🏆 Sistema de Logros
 
-```bash
-# Clonar el repositorio
-git clone https://github.com/robertcanoe/escape-terminal.git
+- **Velocista**: Completa un reto en menos de 2 minutos
+- **Experto**: Completa un reto sin usar pistas
+- **Perfección**: Completa un reto sin errores
 
-# Navegar al directorio
-cd escape-terminal
+## 🚀 Cómo Jugar
 
-# Iniciar servidor local
-python -m http.server 8000
-```
+1. Abre el juego en tu navegador
+2. Haz clic en "INICIAR MISIÓN"
+3. Lee el briefing del reto actual
+4. Usa comandos de Linux para navegar y encontrar pistas
+5. Completa el objetivo antes de que se agote el tiempo
+6. ¡Consigue la mayor puntuación posible!
 
-## 📝 Comandos del Juego
+## 🎯 Objetivos del Juego
 
-| Comando | Descripción |
-|---------|-------------|
-| `ls`    | Listar archivos |
-| `cd`    | Cambiar directorio |
-| `cat`   | Leer archivos |
-| `clear` | Limpiar pantalla |
-| `help`  | Ver comandos disponibles |
-| `hint`  | Obtener una pista |
+- Hackear sistemas
+- Encontrar archivos ocultos
+- Descifrar contraseñas
+- Eliminar virus
+- Recuperar datos críticos
 
-## 🎯 Objetivo
+## 🛠️ Tecnologías Utilizadas
 
-Debes navegar por el sistema de archivos, descubrir pistas y resolver el desafío antes de que se agote el tiempo. Cada misión tiene objetivos específicos que deberás completar.
+- HTML5
+- CSS3 con animaciones avanzadas
+- JavaScript vanilla
+- LocalStorage para guardado de progreso
 
-## 🎮 Controles
+## ⚙️ Instalación Local
 
-| Tecla | Acción |
-|-------|--------|
-| `Enter` | Ejecutar comando |
-| `↑/↓` | Navegar historial |
-| `Ctrl + C` | Salir del juego |
-| `Tab` | Autocompletar|
+1. Clona este repositorio
+2. Abre `index.html` en tu navegador
+3. ¡Empieza a jugar!
 
----
+## 🎨 Personalización
 
-### 📄 Licencia
+El juego puede ser personalizado modificando:
+- `filesystem.js`: Estructura de archivos y contenido
+- `game.js`: Retos y lógica del juego
+- `style.css`: Apariencia y animaciones
 
-Este proyecto está bajo la Licencia MIT
+## 📝 Licencia
 
-### 🤝 Contribuciones
+MIT License - Siéntete libre de usar y modificar el código
 
-Las contribuciones son bienvenidas. Por favor, abre un _issue_ primero para discutir los cambios que te gustaría hacer.
+## 👨‍💻 Autor
 
----
+Roberto Cano Estévez - 2025
 
-Desarrollado por [Roberto Cano Estévez](https://github.com/tuusuario)
+## 🤝 Contribuciones
+
+Las contribuciones son bienvenidas. Por favor, abre un issue primero para discutir los cambios que te gustaría hacer.
 
