@@ -3,38 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
-    <title>Escape de la Terminal</title>
+    <meta name="description" content="Escape Terminal - Un juego de aventura basado en terminal">
+    <meta name="keywords" content="terminal, juego, escape room, linux, comandos">
+    <title>Escape Terminal</title>
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Pantalla de inicio mejorada -->
     <div id="intro-screen">
-        <h1 class="glitch-text">ESCAPE DE LA TERMINAL</h1>
-        <p class="typing-effect">Sistema comprometido. Necesitas escapar.</p>
-        <div class="instructions">
-            <p>Usa comandos reales de terminal para sobrevivir.</p>
-            <p>Comandos disponibles: ls, cd, cat, clear, help...</p>
+        <div class="intro-content">
+            <div class="glitch-container">
+                <h1 class="glitch-text">ESCAPE TERMINAL</h1>
+            </div>
+            
+            <div class="intro-message typing-effect">
+                <p class="message-line">ALERTA DE SEGURIDAD NIVEL 1</p>
+                <p class="message-line">Usuario: Agente</p>
+                <p class="message-line">Estado: Sistema Comprometido</p>
+                <p class="message-line">Tiempo Restante: 10:00</p>
+                <p class="message-line blink-text">Acceso de emergencia requerido</p>
+            </div>
+
+            <div class="mission-brief">
+                <p>Agente, el sistema principal ha sido comprometido.</p>
+                <p>Tu misión:</p>
+                <ul>
+                    <li>✓ Navegar por el sistema usando comandos Linux</li>
+                    <li>✓ Encontrar y eliminar amenazas</li>
+                    <li>✓ Recuperar datos críticos</li>
+                    <li>✓ Asegurar el sistema antes del tiempo límite</li>
+                </ul>
+                <p class="warning-text">¿Aceptas el desafío?</p>
+            </div>
+            <div class="author-signature">
+                Creado por Roberto Cano Estévez- 2025
+            </div>
+
+            <button class="start-button power-on" onclick="startGame()">INICIAR MISIÓN</button>
+            
+            <div class="help-text">
+                Usa 'help' durante la misión para ver los comandos disponibles
+            </div>
+
+            <div class="version-info">v1.0.0</div>
         </div>
-        <button class="start-button" onclick="startGame()">INICIAR SISTEMA</button>
-        <div class="author-signature">Created by Roberto Cano Estévez</div>
     </div>
 
+    <!-- Terminal principal -->
     <div id="terminal" style="display: none;">
         <div id="terminal-header">
-            <span class="terminal-title"></span>
-            <span class="terminal-buttons">
-                <span class="btn close" onclick="exitGame()"></span>
+            <div class="terminal-buttons">
+                <span class="btn close" onclick="exitGame()" title="Salir"></span>
                 <span class="btn minimize"></span>
                 <span class="btn maximize"></span>
-            </span>
+            </div>
+            <div class="terminal-title">user@escape:~</div>
+            <div class="terminal-stats">
+                <span class="time">10:00</span>
+                <span class="hints">💡 3</span>
+                <span class="score">0 pts</span>
+            </div>
         </div>
         <div id="output"></div>
         <div id="input-line">
-            <span class="prompt"></span>
-            <input type="text" id="command-input" autofocus autocomplete="off">
+            <span class="prompt">$</span>
+            <input type="text" id="command-input" autofocus spellcheck="false" autocomplete="off">
         </div>
     </div>
+
+    <!-- Pantallas modales -->
+    <div id="modal-container" style="display: none;">
+        <div class="modal">
+            <div class="modal-content">
+                <h2>¿Necesitas ayuda?</h2>
+                <p>Escribe 'help' para ver los comandos disponibles</p>
+                <button onclick="closeModal()">Entendido</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Elementos de efectos -->
+    <div id="effects-container"></div>
+
+    <!-- Firma del autor -->
+    <div class="author-signature">
+        Creado por Roberto Cano Estévez- 2025
+    </div>
+
+    <!-- Scripts en orden de dependencia -->
+    <script src="data/filesystem.js"></script>
     <script src="game.js"></script>
     <script src="terminal.js"></script>
+    <script src="init.js"></script>
 </body>
 </html>
