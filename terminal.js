@@ -3,16 +3,24 @@ const input = document.getElementById("command-input");
 const output = document.getElementById("output");
 let commandHistory = [];
 let historyIndex = -1;
-let currentPath = ['home', 'user'];
 
 function handleCommand(command) {
+    if (!window.gameState) {
+        printLine('Error: El sistema no está inicializado.', 'error');
+        console.error('gameState no está definido');
+        return;
+    }
+
     if (!command.trim()) {
         printLine('');
         return;
     }
 
     printLine(`${getPrompt()}${command}`, 'command');
-    const [cmd, ...args] = command.toLowerCase().trim().split(' ');
+    const normalizedCommand = command.trim(); // Normalizar comando
+    const [cmd, ...args] = normalizedCommand.toLowerCase().split(' ');
+
+    let isCorrectCommand = false; // Bandera para evitar mensajes de error en comandos correctos
 
     try {
         switch (cmd) {
@@ -26,13 +34,14 @@ function handleCommand(command) {
                 break;
             case 'cat':
                 if (!args[0]) {
-                    printLine("cat: falta operando");
+                    printLine("cat: falta operando", 'error');
+                    gameState.errors++;
                     return;
                 }
                 catFile(args[0]);
                 break;
             case 'pwd':
-                printLine('/' + currentPath.join('/'));
+                printLine('/' + gameState.currentPath.join('/'));
                 break;
             case 'clear':
                 clearTerminal();
@@ -48,7 +57,8 @@ function handleCommand(command) {
                 break;
             case 'grep':
                 if (args.length < 2) {
-                    printLine("grep: faltan parámetros");
+                    printLine("grep: faltan parámetros", 'error');
+                    gameState.errors++;
                     return;
                 }
                 grepInFiles(args[0], args.slice(1));
@@ -56,10 +66,36 @@ function handleCommand(command) {
             case 'hint':
                 useHint();
                 break;
-            case '':
+            case './hack_tool.sh':
+                if (normalizedCommand === './hack_tool.sh K3rn3l_P4ss_2024' && gameState.currentPath.join('/') === 'sys/kernel') {
+                    printLine('Sistema hackeado con éxito.', 'success');
+                    isCorrectCommand = true;
+                } else {
+                    printLine('Error: Contraseña incorrecta o ubicación inválida.', 'error');
+                    gameState.errors++;
+                }
+                break;
+            case './antivirus.sh':
+                if (normalizedCommand === './antivirus.sh --remove malware.exe' && gameState.currentPath.join('/') === 'tmp/virus') {
+                    printLine('Virus eliminado con éxito.', 'success');
+                    isCorrectCommand = true;
+                } else {
+                    printLine('Error: Uso incorrecto o ubicación inválida.', 'error');
+                    gameState.errors++;
+                }
+                break;
+            case 'decrypt':
+                if (normalizedCommand === 'decrypt recovery.dat XK-2024' && gameState.currentPath.join('/') === 'backup') {
+                    printLine('Datos descifrados con éxito.', 'success');
+                    isCorrectCommand = true;
+                } else {
+                    printLine('Error: Clave incorrecta o archivo inválido.', 'error');
+                    gameState.errors++;
+                }
                 break;
             default:
-                printLine(`${cmd}: comando no encontrado`);
+                printLine(`${cmd}: comando no encontrado. Escribe 'help' para ver los comandos disponibles.`, 'error');
+                gameState.errors++;
         }
     } catch (error) {
         console.error('Error ejecutando comando:', error);
@@ -68,7 +104,7 @@ function handleCommand(command) {
     }
 
     // Verificar progreso después de cada comando
-    checkProgress(command);
+    checkProgress(normalizedCommand, isCorrectCommand);
 }
 
 function listFiles(path = '.', flags = []) {
@@ -78,21 +114,21 @@ function listFiles(path = '.', flags = []) {
     try {
         // Resolver el path objetivo
         if (path === '.') {
-            targetPath = [...currentPath];
+            targetPath = [...gameState.currentPath];
             targetDir = getDir(targetPath);
         } else if (path === '..') {
-            targetPath = currentPath.length > 1 ? currentPath.slice(0, -1) : [];
+            targetPath = gameState.currentPath.length > 1 ? gameState.currentPath.slice(0, -1) : [];
             targetDir = getDir(targetPath);
         } else if (path.startsWith('/')) {
             targetPath = path.split('/').filter(p => p);
             targetDir = getDir(targetPath);
         } else {
-            targetPath = [...currentPath, path];
+            targetPath = [...gameState.currentPath, path];
             targetDir = getDir(targetPath);
         }
 
         if (!targetDir) {
-            printLine(`ls: no se puede acceder a '${path}': No existe el directorio`);
+            printLine(`ls: no se puede acceder a '${path}': No existe el directorio`, 'error');
             gameState.errors++;
             return;
         }
@@ -142,16 +178,10 @@ function listFiles(path = '.', flags = []) {
             // Formato normal con clases CSS
             const formattedFiles = files.map(([name, content]) => {
                 const element = document.createElement('span');
-                if (typeof content === 'object') {
-                    element.className = 'file-directory';
-                    element.textContent = name + '/';
-                } else if (name.endsWith('.sh') || name.endsWith('.exe')) {
-                    element.className = 'file-executable';
-                    element.textContent = name;
-                } else {
-                    element.className = 'file-regular';
-                    element.textContent = name;
-                }
+                element.className = typeof content === 'object' ? 'file-directory' :
+                                  (name.endsWith('.sh') || name.endsWith('.exe')) ? 'file-executable' :
+                                  'file-regular';
+                element.textContent = name + (typeof content === 'object' ? '/' : '');
                 return element.outerHTML;
             });
 
@@ -174,7 +204,7 @@ function listFiles(path = '.', flags = []) {
         }
     } catch (error) {
         console.error('Error en ls:', error);
-        printLine('Error al listar el directorio');
+        printLine('Error al listar el directorio', 'error');
         gameState.errors++;
     }
 }
@@ -186,43 +216,35 @@ function catFile(arg) {
         let fileName;
 
         if (arg.includes('/')) {
-            // Si es una ruta con directorios
             const parts = arg.split('/');
-           
-            const dirPath = parts.join('/');
-            
-            if (arg.startsWith('/')) {
-                targetPath = parts.filter(p => p);
-            } else {
-                targetPath = [...currentPath, ...parts.filter(p => p)];
-            }
+            fileName = parts.pop(); // Última parte es el nombre del archivo
+            const dirPath = parts.filter(p => p); // Resto es el directorio
+            targetPath = arg.startsWith('/') ? dirPath : [...gameState.currentPath, ...dirPath];
             targetDir = getDir(targetPath);
         } else {
-            // Si es solo un nombre de archivo
-            targetDir = getDir(currentPath);
+            targetDir = getDir(gameState.currentPath);
             fileName = arg;
         }
 
         if (!targetDir) {
-            printLine(`cat: ${arg}: No existe el directorio`);
+            printLine(`cat: ${arg}: No existe el directorio`, 'error');
             gameState.errors++;
             return;
         }
 
         if (typeof targetDir[fileName] === 'string') {
             printLine(targetDir[fileName]);
-            // Registrar el archivo como descubierto
             gameState.discoveredFiles.add(fileName);
         } else if (typeof targetDir[fileName] === 'object') {
-            printLine(`cat: ${fileName}: Es un directorio`);
+            printLine(`cat: ${fileName}: Es un directorio`, 'error');
             gameState.errors++;
         } else {
-            printLine(`cat: ${arg}: No existe el archivo`);
+            printLine(`cat: ${fileName}: No existe el archivo`, 'error');
             gameState.errors++;
         }
     } catch (error) {
         console.error('Error en cat:', error);
-        printLine('Error al leer el archivo');
+        printLine('Error al leer el archivo', 'error');
         gameState.errors++;
     }
 }
@@ -234,29 +256,29 @@ function changeDir(arg) {
         if (!arg || arg === '~') {
             newPath = ['home', 'user'];
         } else if (arg === '..') {
-            newPath = currentPath.length > 1 ? currentPath.slice(0, -1) : [];
+            newPath = gameState.currentPath.length > 1 ? gameState.currentPath.slice(0, -1) : [];
         } else if (arg === '.') {
             return; // Mantener el directorio actual
         } else if (arg.startsWith('/')) {
             newPath = arg.split('/').filter(p => p);
         } else {
-            newPath = [...currentPath, arg];
+            newPath = [...gameState.currentPath, arg];
         }
 
         const targetDir = getDir(newPath);
         if (!targetDir || typeof targetDir !== 'object') {
-            printLine(`cd: ${arg}: No existe el directorio`);
+            printLine(`cd: ${arg}: No existe el directorio`, 'error');
             gameState.errors++;
             return;
         }
 
         // Si llegamos aquí, el directorio existe y es válido
-        currentPath = newPath;
+        gameState.currentPath = newPath;
         updateTerminalHeader();
         
     } catch (error) {
         console.error('Error en cd:', error);
-        printLine('Error al cambiar de directorio');
+        printLine('Error al cambiar de directorio', 'error');
         gameState.errors++;
     }
 }
@@ -266,21 +288,28 @@ function clearTerminal() {
 }
 
 function printLine(text, type = 'response') {
+    const output = document.getElementById('output');
     const line = document.createElement('div');
     line.className = `terminal-line ${type}`;
     
-    // Si el texto contiene HTML, asegurarse de que se renderice correctamente
+    if (text.includes('=== NUEVO RETO ===') || text.includes('Buena suerte, agente.')) {
+        const spacer = document.createElement('div');
+        spacer.style.height = '1rem';
+        output.appendChild(spacer);
+    }
+    
+    line.style.whiteSpace = 'pre';
     if (text.includes('<span')) {
         line.innerHTML = text;
     } else {
         line.textContent = text;
     }
     
-    // Asegurar que se mantenga el espaciado
-    line.style.whiteSpace = 'pre';
-    
     output.appendChild(line);
-    output.scrollTop = output.scrollHeight;
+    requestAnimationFrame(() => {
+        output.scrollTop = output.scrollHeight;
+        document.getElementById('command-input').scrollIntoView({ behavior: 'smooth' });
+    });
 }
 
 // Event listeners para el input
@@ -313,27 +342,34 @@ input.addEventListener("keydown", function(e) {
 });
 
 function autoComplete() {
-    const input_text = input.value;
-    const args = input_text.split(' ');
-    const currentArg = args[args.length - 1];
-    
-    const dir = getDir(currentPath);
-    if (!dir) return;
-    
-    // Solo mostrar archivos ocultos si el usuario está escribiendo explícitamente un punto
-    const possibilities = Object.keys(dir).filter(name => {
-        if (currentArg.startsWith('.')) {
-            return name.startsWith(currentArg);
-        } else {
-            return !name.startsWith('.') && name.startsWith(currentArg);
+    const inputText = input.value.trim();
+    const args = inputText.split(' ');
+    const currentArg = args[0]; // Primer argumento es el comando
+
+    if (args.length === 1 && !inputText.endsWith(' ')) {
+        const commands = ['ls', 'cd', 'cat', 'pwd', 'clear', 'help', 'tree', 'find', 'grep', 'hint', './hack_tool.sh', './antivirus.sh', 'decrypt'];
+        const possibilities = commands.filter(cmd => cmd.startsWith(currentArg));
+        if (possibilities.length === 1) {
+            input.value = possibilities[0] + ' ';
+        } else if (possibilities.length > 1) {
+            printLine(possibilities.join('  '));
         }
-    });
-    
-    if (possibilities.length === 1) {
-        args[args.length - 1] = possibilities[0];
-        input.value = args.join(' ');
-    } else if (possibilities.length > 1) {
-        printLine(possibilities.join('  '));
+    } else {
+        const dir = getDir(gameState.currentPath);
+        if (!dir) return;
+        const currentArgLast = args[args.length - 1];
+        const possibilities = Object.keys(dir).filter(name => {
+            if (currentArgLast.startsWith('.')) {
+                return name.startsWith(currentArgLast);
+            }
+            return !name.startsWith('.') && name.startsWith(currentArgLast);
+        });
+        if (possibilities.length === 1) {
+            args[args.length - 1] = possibilities[0];
+            input.value = args.join(' ') + (typeof dir[possibilities[0]] === 'object' ? '/' : '');
+        } else if (possibilities.length > 1) {
+            printLine(possibilities.join('  '));
+        }
     }
 }
 
@@ -351,9 +387,10 @@ input.addEventListener('blur', () => {
 });
 
 function showTree(path = '.', prefix = '') {
-    const dir = path === '.' ? getDir(currentPath) : getDir(resolvePath(path));
+    const dir = path === '.' ? getDir(gameState.currentPath) : getDir(resolvePath(path));
     if (!dir) {
-        printLine(`tree: no se puede acceder a '${path}'`);
+        printLine(`tree: no se puede acceder a '${path}'`, 'error');
+        gameState.errors++;
         return;
     }
 
@@ -390,11 +427,11 @@ function findFiles(args) {
         }
     }
 
-    searchInDir(getDir(currentPath), currentPath);
+    searchInDir(getDir(gameState.currentPath), gameState.currentPath);
 }
 
 function grepInFiles(pattern, files) {
-    const searchDir = getDir(currentPath);
+    const searchDir = getDir(gameState.currentPath);
     
     files.forEach(file => {
         // Permitir buscar en archivos ocultos solo si se especifica explícitamente
@@ -408,9 +445,11 @@ function grepInFiles(pattern, files) {
                     }
                 });
             } else if (content === undefined) {
-                printLine(`grep: ${file}: No existe el archivo`);
+                printLine(`grep: ${file}: No existe el archivo`, 'error');
+                gameState.errors++;
             } else {
-                printLine(`grep: ${file}: No es un archivo de texto`);
+                printLine(`grep: ${file}: No es un archivo de texto`, 'error');
+                gameState.errors++;
             }
         }
     });
@@ -434,7 +473,9 @@ function showHelp() {
 }
 
 function resolvePath(path) {
-    if (!path) return currentPath;
+    if (!path || typeof path !== 'string') {
+        return gameState.currentPath;
+    }
     
     let resolvedPath = [];
     
@@ -445,7 +486,7 @@ function resolvePath(path) {
         resolvedPath = ['home', 'user'];
     } else {
         // Ruta relativa
-        resolvedPath = [...currentPath];
+        resolvedPath = [...gameState.currentPath];
         const parts = path.split('/');
         
         for (const part of parts) {
@@ -465,5 +506,5 @@ function resolvePath(path) {
 }
 
 function getPrompt() {
-    return window.formatPrompt(currentPath);
+    return window.formatPrompt(gameState.currentPath);
 }
