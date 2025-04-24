@@ -1,33 +1,5 @@
-window.formatPrompt = function(path) {
-    return `user@escape:/${path.join("/")}$ `;
-};
-
-// Función de impresión compartida
-function printLine(text, type = 'response') {
-    const output = document.getElementById('output');
-    const line = document.createElement('div');
-    line.className = `terminal-line ${type}`;
-    
-    if (text.includes('=== NUEVO RETO ===')) {
-        const spacer = document.createElement('div');
-        spacer.style.height = '1rem';
-        output.appendChild(spacer);
-    }
-    
-    line.innerHTML = text;
-    output.appendChild(line);
-    
-    if (text.includes('Buena suerte, agente.')) {
-        const spacer = document.createElement('div');
-        spacer.style.height = '1rem';
-        output.appendChild(spacer);
-    }
-    
-    requestAnimationFrame(() => {
-        output.scrollTop = output.scrollHeight;
-        document.getElementById('command-input').scrollIntoView({ behavior: 'smooth' });
-    });
-}
+// Estado global del juego
+let usedChallenges = new Set();
 
 const CHALLENGES = {
     hackSystem: {
@@ -118,7 +90,8 @@ const gameState = {
     discoveredFiles: new Set(),
     currentChallenge: null,
     timerInterval: null,
-    lastCommand: ''
+    lastCommand: '',
+    currentPath: ['home', 'user']
 };
 
 // Funciones de tiempo
@@ -187,6 +160,7 @@ function exitGame() {
             gameState.hints = 3;
             gameState.score = 0;
             gameState.errors = 0;
+            gameState.currentPath = ['home', 'user'];
             
             // Limpiar intervalos
             if (gameState.timerInterval) {
@@ -199,9 +173,7 @@ function exitGame() {
     }
 }
 
-// Mejorar la función de selección de retos para evitar repeticiones
-let usedChallenges = new Set();
-
+// Selección de retos
 function selectRandomChallenge() {
     const availableChallenges = Object.entries(CHALLENGES).filter(
         ([key]) => !usedChallenges.has(key)
@@ -232,6 +204,10 @@ function showChallengeBrief() {
 
 // Función para usar pistas
 function useHint() {
+    if (!gameState.currentChallenge) {
+        printLine('Error: No hay un reto activo.', 'error');
+        return;
+    }
     if (gameState.hints <= 0) {
         printLine("No te quedan pistas disponibles.", "error");
         return;
@@ -239,7 +215,7 @@ function useHint() {
     
     const challenge = gameState.currentChallenge;
     const hintIndex = 3 - gameState.hints;
-    if (hintIndex < challenge.hints.length) {
+    if (challenge.hints && hintIndex < challenge.hints.length) {
         gameState.hints--;
         updateStats();
         printLine(`💡 PISTA: ${challenge.hints[hintIndex]}`, "info");
@@ -249,7 +225,7 @@ function useHint() {
 }
 
 // Verificar progreso
-function checkProgress(command) {
+function checkProgress(command, isCorrectCommand) {
     if (!gameState.currentChallenge) return;
     
     const challenge = gameState.currentChallenge;
@@ -267,7 +243,7 @@ function checkProgress(command) {
     // Check file discoveries and give immediate feedback
     if (command.startsWith('cat ')) {
         const fileName = command.split(' ')[1];
-        const currentDir = getDir(currentPath);
+        const currentDir = getDir(gameState.currentPath);
         if (currentDir && currentDir[fileName]) {
             if (!gameState.discoveredFiles.has(fileName)) {
                 gameState.discoveredFiles.add(fileName);
@@ -293,7 +269,7 @@ function checkProgress(command) {
     }
 
     // Check directory progress
-    const currentPathStr = '/' + currentPath.join('/');
+    const currentPathStr = '/' + gameState.currentPath.join('/');
     if (currentPathStr.endsWith(winConditions.requiredPath) && 
         !gameState.pathFound) {
         gameState.pathFound = true;
@@ -305,7 +281,8 @@ function checkProgress(command) {
     // Give contextual hints on repeated failed attempts
     if (gameState.commandAttempts && 
         gameState.commandAttempts.length > 5 &&
-        !gameState.hintGiven) {
+        !gameState.hintGiven &&
+        !isCorrectCommand) {
         const lastFiveCommands = gameState.commandAttempts.slice(-5);
         const hasRepeatedFailures = lastFiveCommands.every(cmd => 
             !cmd.startsWith(winConditions.requiredCommand)
@@ -330,7 +307,7 @@ function isVictoryConditionMet() {
     const winConditions = challenge.winConditions;
     
     // Verificar que estamos en el directorio correcto
-    const currentPathStr = '/' + currentPath.join('/');
+    const currentPathStr = '/' + gameState.currentPath.join('/');
     if (!currentPathStr.endsWith(winConditions.requiredPath)) {
         return false;
     }
@@ -393,7 +370,8 @@ function startNewChallenge() {
     gameState.pathFound = false;
     gameState.hintGiven = false;
     gameState.commandAttempts = [];
-    currentPath = ['home', 'user'];
+    gameState.lastCommand = '';
+    gameState.currentPath = ['home', 'user'];
     
     // Select new challenge, ensuring it's different from the last one
     let newChallenge;
@@ -461,7 +439,7 @@ function closeModal() {
     document.getElementById('command-input').focus();
 }
 
-// Mejorar la función de efectos visuales
+// Efectos visuales
 function showEffect(text, type, callback) {
     const effectsContainer = document.getElementById('effects-container');
     const effectDiv = document.createElement('div');
@@ -482,7 +460,7 @@ function showEffect(text, type, callback) {
     }, 2000);
 }
 
-// Mejorar el manejo de logros
+// Manejo de logros
 function checkAchievements() {
     const achievements = [];
     
@@ -513,7 +491,7 @@ function checkAchievements() {
     return achievements;
 }
 
-// Mejorar la pantalla de victoria
+// Pantalla de victoria
 function showVictoryScreen(achievements) {
     const victoryDiv = document.createElement('div');
     victoryDiv.className = 'victory-screen fade-effect';
@@ -529,36 +507,37 @@ function showVictoryScreen(achievements) {
     }).join('');
     
     victoryDiv.innerHTML = `
-        <h2>¡MISIÓN COMPLETADA!</h2>
-        <div class="stats-container">
-            <div class="stat-item">
-                <span class="stat-label">Tiempo:</span>
-                <span class="stat-value">${formatTime(600 - gameState.timeRemaining)}</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">Puntuación Base:</span>
-                <span class="stat-value">${gameState.score}</span>
-            </div>
-            ${achievements.length > 0 ? `
-                <div class="achievements-container">
-                    <h3>Logros Desbloqueados:</h3>
-                    <ul class="achievements-list">
-                        ${achievementsList}
-                    </ul>
-                    <div class="bonus-points">
-                        Bonus Total: +${totalBonus}
-                    </div>
+    <h2>¡MISIÓN COMPLETADA!</h2>
+    <div class="stats-container">
+        <div class="stat-item">
+            <span class="stat-label">Tiempo:</span>
+            <span class="stat-value">${formatTime(600 - gameState.timeRemaining)}</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Puntuación Base:</span>
+            <span class="stat-value">${gameState.score}</span>
+        </div>
+        ${achievements.length > 0 ? `
+            <div class="achievements-container">
+                <h3>Logros Desbloqueados:</h3>
+                <ul class="achievements-list">
+                    ${achievementsList}
+                </ul>
+                <div class="bonus-points">
+                    Bonus Total: +${totalBonus}
                 </div>
-            ` : ''}
-            <div class="final-score">
-                Puntuación Final: ${gameState.score + totalBonus}
             </div>
+        ` : ''}
+        <div class="final-score">
+            Puntuación Final: ${gameState.score + totalBonus}
         </div>
-        <div class="victory-buttons">
-            <button onclick="startNewChallenge()" class="next-mission">Siguiente Misión</button>
-            <button onclick="exitGame()" class="exit-game">Salir</button>
-        </div>
-    `;
+    </div>
+    <div class="victory-buttons">
+        <button onclick="startNewChallenge()" class="next-mission">Siguiente Misión</button>
+        <button onclick="exitGame()" class="exit-game">Salir</button>
+    </div>
+`;
+
     
     document.body.appendChild(victoryDiv);
     
@@ -566,16 +545,54 @@ function showVictoryScreen(achievements) {
     showEffect("🎉", "success");
 }
 
-// Función para actualizar el encabezado del terminal
+// Actualizar el encabezado del terminal
 function updateTerminalHeader() {
     const headerTitle = document.querySelector('.terminal-title');
-    headerTitle.textContent = `user@escape:/${currentPath.join('/')}`;
+    headerTitle.textContent = `user@escape:/${gameState.currentPath.join('/')}`;
 }
 
-// Actualizar el estado después de cada comando
-function afterCommand() {
-    updateStats();
-    saveGameState();
+// Guardar y cargar estado
+function saveGameState() {
+    const state = {
+        version: '1.0.0',
+        timeRemaining: gameState.timeRemaining,
+        hints: gameState.hints,
+        score: gameState.score,
+        discoveredFiles: Array.from(gameState.discoveredFiles),
+        currentPath: gameState.currentPath,
+        currentChallenge: gameState.currentChallenge,
+        usedChallenges: Array.from(usedChallenges)
+    };
+    
+    try {
+        localStorage.setItem('escapeTerminalState', JSON.stringify(state));
+    } catch (error) {
+        console.error('Error guardando estado:', error);
+    }
+}
+
+function loadGameState() {
+    try {
+        const savedState = localStorage.getItem('escapeTerminalState');
+        if (savedState) {
+            const state = JSON.parse(savedState);
+            if (state.version !== '1.0.0') {
+                console.warn('Estado guardado de versión antigua. Reiniciando.');
+                return false;
+            }
+            gameState.timeRemaining = state.timeRemaining;
+            gameState.hints = state.hints;
+            gameState.score = state.score;
+            gameState.discoveredFiles = new Set(state.discoveredFiles);
+            gameState.currentChallenge = state.currentChallenge;
+            gameState.currentPath = state.currentPath;
+            usedChallenges = new Set(state.usedChallenges);
+            return true;
+        }
+    } catch (error) {
+        console.error('Error cargando estado:', error);
+    }
+    return false;
 }
 
 // Mostrar tutorial en el primer inicio
@@ -597,38 +614,6 @@ startGame = function() {
     updateStats();
 }
 
-function saveGameState() {
-    const state = {
-        timeRemaining: gameState.timeRemaining,
-        hints: gameState.hints,
-        score: gameState.score,
-        discoveredFiles: Array.from(gameState.discoveredFiles),
-        currentPath: currentPath,
-        currentChallenge: gameState.currentChallenge
-    };
-    
-    try {
-        localStorage.setItem('escapeTerminalState', JSON.stringify(state));
-    } catch (error) {
-        console.error('Error guardando estado:', error);
-    }
-}
-
-function loadGameState() {
-    try {
-        const savedState = localStorage.getItem('escapeTerminalState');
-        if (savedState) {
-            const state = JSON.parse(savedState);
-            gameState.timeRemaining = state.timeRemaining;
-            gameState.hints = state.hints;
-            gameState.score = state.score;
-            gameState.discoveredFiles = new Set(state.discoveredFiles);
-            gameState.currentChallenge = state.currentChallenge;
-            currentPath = state.currentPath;
-            return true;
-        }
-    } catch (error) {
-        console.error('Error cargando estado:', error);
-    }
-    return false;
-}
+// Exponer funciones necesarias para los botones de la pantalla de victoria
+window.startNewChallenge = startNewChallenge;
+window.exitGame = exitGame;
