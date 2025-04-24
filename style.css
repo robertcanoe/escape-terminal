@@ -81,49 +81,122 @@ body {
   color: #00ff00;
 }
 
+/* Estilos mejorados para la pantalla de inicio */
 #intro-screen {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: #000;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 2rem;
 }
 
-.glitch-text {
-  font-size: 2.5rem;
-  color: #0f0;
-  text-shadow: 2px 2px #ff0000;
-  animation: glitch 1s infinite;
+.intro-content {
+    max-width: 800px;
+    width: 90%;
+    text-align: center;
 }
 
-.start-button {
-  margin-top: 2rem;
-  padding: 1rem 2rem;
-  background: transparent;
-  border: 2px solid #0f0;
-  color: #0f0;
-  font-family: 'Courier New', Courier, monospace;
-  cursor: pointer;
-  transition: all 0.3s;
+.intro-message {
+    margin: 2rem 0;
+    text-align: left;
+    background: rgba(0, 255, 0, 0.1);
+    padding: 1.5rem;
+    border: 1px solid #0f0;
+    box-shadow: 0 0 10px #0f0;
 }
 
-.start-button:hover {
-  background: #0f0;
-  color: #000;
+.message-line {
+    margin: 0.5rem 0;
+    font-family: 'Courier New', monospace;
+    color: #0f0;
 }
 
+.blink-text {
+    animation: blink 1s step-end infinite;
+    color: #ff0000;
+}
+
+.mission-brief {
+    margin: 2rem 0;
+    text-align: left;
+    padding: 1.5rem;
+    border: 1px solid #0f0;
+    background: rgba(0, 255, 0, 0.05);
+}
+
+.mission-brief p {
+    margin: 0.8rem 0;
+    line-height: 1.5;
+}
+
+.mission-brief ul {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0;
+}
+
+.mission-brief li {
+    margin: 0.5rem 0;
+    padding-left: 1.5rem;
+    position: relative;
+}
+
+.mission-brief li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: #0f0;
+}
+
+.warning-text {
+    color: #ff0;
+    text-shadow: 0 0 10px #ff0;
+    font-size: 1.2rem;
+    margin-top: 1.5rem !important;
+}
+
+.help-text {
+    margin-top: 1rem;
+    color: #0f0;
+    opacity: 0.8;
+    font-size: 0.9rem;
+}
+
+.version-info {
+    position: absolute;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #0f0;
+    opacity: 0.5;
+    font-size: 0.8rem;
+}
+
+/* Efectos de escritura mejorados */
 .typing-effect {
-  overflow: hidden;
-  white-space: nowrap;
-  border-right: 2px solid #0f0;
-  animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+    overflow: hidden;
+    border-right: none;
 }
+
+.typing-effect .message-line {
+    overflow: hidden;
+    white-space: nowrap;
+    animation: typing 2s steps(40, end);
+    margin: 0;
+}
+
+.typing-effect .message-line:nth-child(1) { animation-delay: 0s; }
+.typing-effect .message-line:nth-child(2) { animation-delay: 0.5s; }
+.typing-effect .message-line:nth-child(3) { animation-delay: 1s; }
+.typing-effect .message-line:nth-child(4) { animation-delay: 1.5s; }
+.typing-effect .message-line:nth-child(5) { animation-delay: 2s; }
 
 @keyframes typing {
   from { width: 0 }
@@ -139,81 +212,95 @@ body {
   100% { transform: translate(0) }
 }
 
-/* Efectos visuales */
-.effect {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    padding: 2rem;
-    background: rgba(0, 0, 0, 0.9);
-    border: 2px solid #0f0;
-    color: #0f0;
-    font-size: 2rem;
-    z-index: 1000;
-    animation: pulse 1s infinite;
+/* Efectos de pulso mejorados */
+@keyframes pulseWarning {
+    0% { box-shadow: 0 0 5px #ff0000; }
+    50% { box-shadow: 0 0 20px #ff0000; }
+    100% { box-shadow: 0 0 5px #ff0000; }
 }
 
-.hack {
-    text-shadow: 0 0 10px #0f0;
+@keyframes pulseSuccess {
+    0% { box-shadow: 0 0 5px #0f0; }
+    50% { box-shadow: 0 0 20px #0f0; }
+    100% { box-shadow: 0 0 5px #0f0; }
 }
 
-.decrypt {
-    border-color: #00ff00;
-    text-shadow: 0 0 10px #00ff00;
-}
-
-.warning {
-    border-color: #ff0000;
+/* Efectos mejorados para mensajes */
+.terminal-line.error {
     color: #ff0000;
-    text-shadow: 0 0 10px #ff0000;
+    text-shadow: 0 0 5px #ff0000;
+    animation: pulseWarning 2s infinite;
 }
 
-/* Pantalla de victoria */
+.terminal-line.success {
+    color: #00ff00;
+    text-shadow: 0 0 5px #0f0;
+    animation: pulseSuccess 2s infinite;
+}
+
+/* Efecto de desvanecimiento para transiciones */
+.fade-effect {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Mejora de la pantalla de victoria */
 .victory-screen {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    padding: 2rem;
     background: rgba(0, 0, 0, 0.95);
     border: 2px solid #0f0;
-    color: #0f0;
-    text-align: center;
-    z-index: 1000;
-    animation: slideIn 0.5s ease-out;
+    box-shadow: 0 0 20px #0f0;
+    animation: pulseSuccess 2s infinite, slideIn 0.5s ease-out;
 }
 
 .victory-screen h2 {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-    text-shadow: 0 0 10px #0f0;
-}
-
-.victory-screen button {
-    margin-top: 1rem;
-    padding: 0.5rem 1rem;
-    background: transparent;
-    border: 1px solid #0f0;
     color: #0f0;
-    cursor: pointer;
-    transition: all 0.3s;
+    text-shadow: 0 0 10px #0f0;
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
 }
 
-.victory-screen button:hover {
+.victory-screen ul {
+    list-style: none;
+    padding: 0;
+}
+
+.victory-screen li {
+    color: #0f0;
+    margin: 0.5rem 0;
+    text-shadow: 0 0 5px #0f0;
+}
+
+/* Mejora de los botones */
+.victory-screen button,
+.start-button {
+    background: transparent;
+    border: 2px solid #0f0;
+    color: #0f0;
+    padding: 1rem 2rem;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-shadow: 0 0 5px #0f0;
+    position: relative;
+    overflow: hidden;
+}
+
+.victory-screen button:hover,
+.start-button:hover {
     background: #0f0;
     color: #000;
+    box-shadow: 0 0 20px #0f0;
 }
 
-@keyframes pulse {
-    0% { transform: translate(-50%, -50%) scale(1); }
-    50% { transform: translate(-50%, -50%) scale(1.1); }
-    100% { transform: translate(-50%, -50%) scale(1); }
-}
-
-@keyframes slideIn {
-    from { transform: translate(-50%, -100%); opacity: 0; }
-    to { transform: translate(-50%, -50%); opacity: 1; }
+/* Efecto de hover para comandos */
+.terminal-line.command:hover {
+    background: rgba(0, 255, 0, 0.1);
+    cursor: pointer;
 }
 
 /* Mejoras para el espaciado de la terminal */
@@ -363,4 +450,95 @@ body {
 
 .author-signature:hover {
     opacity: 1;
+}
+
+/* Efectos para la pantalla de victoria */
+@keyframes slideIn {
+    from { transform: translateY(-100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes glow {
+    0% { text-shadow: 0 0 5px #0f0; }
+    50% { text-shadow: 0 0 20px #0f0, 0 0 30px #0f0; }
+    100% { text-shadow: 0 0 5px #0f0; }
+}
+
+/* Efectos del contenedor */
+#effects-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 1000;
+}
+
+.effect {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2rem;
+    z-index: 2000;
+    text-align: center;
+    pointer-events: none;
+    white-space: nowrap;
+    text-shadow: 0 0 10px currentColor;
+}
+
+.effect.success {
+    color: #0f0;
+    animation: glow 1s infinite alternate;
+}
+
+.effect.warning {
+    color: #ff0;
+    animation: glow 1s infinite alternate;
+}
+
+.effect.error {
+    color: #f00;
+    animation: glow 1s infinite alternate;
+}
+
+@keyframes glow {
+    from { text-shadow: 0 0 10px currentColor; }
+    to { text-shadow: 0 0 20px currentColor, 0 0 30px currentColor; }
+}
+
+/* Mejorar la visibilidad del input activo */
+#command-input:focus {
+    outline: none;
+    box-shadow: 0 0 5px #0f0;
+    background: rgba(0, 255, 0, 0.1);
+}
+
+/* Efecto de transición mejorado */
+.fade-effect {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Estilos para el listado de archivos */
+.terminal-line {
+    white-space: pre;
+    font-family: 'Courier New', monospace;
+    line-height: 1.2;
+}
+
+.file-directory {
+    color: #3498db;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.file-executable {
+    color: #2ecc71;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.file-regular {
+    color: #ecf0f1;
+    display: inline-block;
 }
