@@ -20,11 +20,9 @@ function initGame() {
         errors: 0,
         discoveredFiles: new Set(),
         currentChallenge: null,
-        timerInterval: null
+        timerInterval: null,
+        currentPath: ['home', 'user'] // Centralizado aquí
     };
-
-    // Asegurar que currentPath es global
-    window.currentPath = ['home', 'user'];
 
     // Iniciar el estado del juego
     function startNewGame() {
@@ -34,7 +32,7 @@ function initGame() {
         gameState.score = 0;
         gameState.errors = 0;
         gameState.discoveredFiles = new Set();
-        currentPath = ['home', 'user'];
+        gameState.currentPath = ['home', 'user'];
         
         // Seleccionar el primer reto
         gameState.currentChallenge = selectRandomChallenge();
