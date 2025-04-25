@@ -37,7 +37,7 @@ window.filesystem = {
         }
     },
     backup: {
-        'recovery.dat': 'DATOS CRÍTICOS - CIFRADOS\nSe requiere clave de descifrado.',
+        'recovery.dat': 'DATOS CRÍTICOS - CIFRADOS\nSe requiere clave de descifrado con el comando `decrypt´.',
         '.key': 'La clave de descifrado es: XK-2024',
         'backup.log': 'Último respaldo: hace 2 días\nEstado: Completo\nArchivos: Cifrados'
     }
