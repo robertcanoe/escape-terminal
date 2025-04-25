@@ -4,7 +4,7 @@ let usedChallenges = new Set();
 const CHALLENGES = {
     hackSystem: {
         name: "Hackear el Sistema Principal",
-        description: "El sistema principal ha sido comprometido. Necesitas:\n1. Encontrar la contraseña del kernel (archivo .password)\n2. Localizar hack_tool.sh\n3. Usar el comando: ./hack_tool.sh K3rn3l_P4ss_2024\n\nPista inicial: Comienza buscando en /home/user",
+        description: "El sistema principal ha sido comprometido. Necesitas:\n1. Encontrar la contraseña del kernel (archivo .password)\n2. Localizar hack_tool.sh\n3. Usar el comando: ./hack_tool.sh [contraseña]\n\nPista inicial: Comienza buscando en /home/user",
         difficulty: "Difícil",
         paths: [
             {
@@ -55,7 +55,7 @@ const CHALLENGES = {
     },
     dataRecovery: {
         name: "Recuperación de Datos",
-        description: "Datos críticos han sido cifrados. Tu misión:\n1. Encontrar el archivo cifrado (recovery.dat)\n2. Localizar la clave de descifrado (.key)\n3. Usar el comando: decrypt recovery.dat XK-2024\n\nPista inicial: Los archivos están en /backup",
+        description: "Datos críticos han sido cifrados. Tu misión:\n1. Encontrar el archivo cifrado (recovery.dat)\n2. Localizar la clave de descifrado (.key)\n3. Usar el comando: decrypt recovery.dat [contraseña]\n\nPista inicial: Los archivos están en /backup",
         difficulty: "Normal",
         paths: [
             {
